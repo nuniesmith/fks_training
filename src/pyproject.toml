@@ -1,0 +1,19 @@
+[project]
+name = "fks-training"
+version = "0.1.0"
+description = "FKS Model Training Service"
+requires-python = ">=3.11"
+readme = "README.md"
+license = { text = "Proprietary" }
+
+dependencies = [
+  "numpy",
+  "pandas",
+]
+
+[project.optional-dependencies]
+ml = ["scikit-learn", "torch"]
+gpu = ["torch" ]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
