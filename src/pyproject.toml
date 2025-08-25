@@ -1,5 +1,5 @@
 [project]
-name = "fks-training"
+name = "fks_training"
 version = "0.1.0"
 description = "FKS Model Training Service"
 requires-python = ">=3.11"
