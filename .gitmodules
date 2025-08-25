@@ -1,9 +1,9 @@
 [submodule "shared/python"]
-	path = shared/python
-	url = https://github.com/nuniesmith/shared-python.git
+	path = shared/shared_python
+	url = https://github.com/nuniesmith/shared_python.git
 [submodule "shared/schema"]
-	path = shared/schema
-	url = https://github.com/nuniesmith/shared-schema.git
+	path = shared/shared_schema
+	url = https://github.com/nuniesmith/shared_schema.git
 [submodule "shared/scripts"]
-	path = shared/scripts
-	url = https://github.com/nuniesmith/shared-scripts.git
+	path = shared/shared_scripts
+	url = https://github.com/nuniesmith/shared_scripts.git
