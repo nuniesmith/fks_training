@@ -2,7 +2,7 @@ services:
   fks_training:
     build:
       context: .
-      dockerfile: Dockerfile.simple.gpu
+      dockerfile: Dockerfile.gpu
     deploy:
       resources:
         reservations:
