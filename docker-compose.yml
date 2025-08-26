@@ -1,0 +1,21 @@
+services:
+  fks_training:
+    build:
+      context: .
+      dockerfile: Dockerfile.simple.gpu
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - capabilities: [gpu]
+    networks: [fks_net]
+    healthcheck:
+      test: ["CMD-SHELL", "python -c 'import torch; print(torch.cuda.is_available())' || exit 1"]
+      interval: 120s
+      timeout: 20s
+      retries: 2
+      start_period: 90s
+
+networks:
+  fks_net:
+    name: fks_net
