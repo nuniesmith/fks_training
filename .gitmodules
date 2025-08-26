@@ -1,4 +1,4 @@
-[submodule "shared/python"]
+[submodule "shared/shared_python"]
 	path = shared/shared_python
 	url = https://github.com/nuniesmith/shared_python.git
 [submodule "shared/schema"]
