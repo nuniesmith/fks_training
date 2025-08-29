@@ -2,7 +2,21 @@ services:
   fks_training:
     build:
       context: .
-      dockerfile: Dockerfile.gpu
+      dockerfile: shared/shared_docker/templates/python.gpu.Dockerfile
+    working_dir: /app/src
+    command: ["python", "-m", "main"]
+    environment:
+      TZ: America/Toronto
+      SERVICE_PORT: 4400
+      PYTHONPATH: /app/src
+      CUDA_VISIBLE_DEVICES: all
+    ports:
+      - "4400:4400"
+    volumes:
+      - /etc/timezone:/etc/timezone:ro
+      - /etc/localtime:/etc/localtime:ro
+      - ./logs:/app/logs
+      - ./models:/app/models
     deploy:
       resources:
         reservations:
