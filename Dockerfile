@@ -19,9 +19,15 @@ WORKDIR /app/src
 RUN useradd -r -u 1088 appuser
 USER appuser
 
-EXPOSE 4400
+ENV SERVICE_NAME=fks-training \
+    SERVICE_TYPE=training \
+    SERVICE_PORT=8005 \
+    TRAINING_SERVICE_PORT=8005
 
-CMD ["python", "-m", "main"]
+EXPOSE 8005
+
+# Use explicit path to main to avoid module path ambiguity
+CMD ["python", "src/main.py"]
 
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD curl -f http://localhost:4400/health || exit 1
+    CMD curl -f http://localhost:8005/health || exit 1
