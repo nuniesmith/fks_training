@@ -7,10 +7,11 @@ services:
     command: ["python", "-m", "main"]
     environment:
       TZ: America/Toronto
-      SERVICE_PORT: 4400
+      SERVICE_PORT: 8005
+      TRAINING_SERVICE_PORT: 8005
       PYTHONPATH: /app/src
     ports:
-      - "4400:4400"
+      - "8005:8005"
     volumes:
       - /etc/timezone:/etc/timezone:ro
       - /etc/localtime:/etc/localtime:ro
@@ -18,7 +19,7 @@ services:
       - ./models:/app/models
     networks: [fks_net]
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:4400/health || exit 1"]
+      test: ["CMD-SHELL", "curl -f http://localhost:8005/health || exit 1"]
       interval: 30s
       timeout: 10s
       retries: 3
@@ -26,4 +27,5 @@ services:
 
 networks:
   fks_net:
+    name: fks_net
     external: true

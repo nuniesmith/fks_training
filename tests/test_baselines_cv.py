@@ -1,7 +1,10 @@
 import numpy as np  # type: ignore
-from shared_python.types import BaselineModelParams  # type: ignore
-from fks_training.models.baselines import XGBoostClassifierWrapper, CatBoostClassifierWrapper
-from fks_training.models.time_series_cv import rolling_purged_splits
+try:
+    from fks_shared_python.types import BaselineModelParams  # type: ignore
+except Exception:  # pragma: no cover
+    from shared_python.types import BaselineModelParams  # type: ignore
+from models.baselines import XGBoostClassifierWrapper, CatBoostClassifierWrapper
+from models.time_series_cv import rolling_purged_splits
 
 
 def _tiny_dataset(n=40):
