@@ -10,7 +10,7 @@ authors = ["FKS <nunie.smith01@gmail.com>"]
 dependencies = [
   "numpy",
   "pandas",
-  "shared_python @ file://../../../shared/shared_python",
+  "shared_python @ file://../../../shared/python",
   "scikit-learn",
   "xgboost",
   "catboost",
