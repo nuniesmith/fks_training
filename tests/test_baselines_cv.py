@@ -1,6 +1,6 @@
 import numpy as np  # type: ignore
 try:
-    from fks_shared_python.types import BaselineModelParams  # type: ignore
+    from shared_python.types import BaselineModelParams  # type: ignore
 except Exception:  # pragma: no cover
     from shared_python.types import BaselineModelParams  # type: ignore
 from models.baselines import XGBoostClassifierWrapper, CatBoostClassifierWrapper
