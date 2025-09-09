@@ -1,5 +1,6 @@
 services:
   fks_training:
+    profiles: ["gpu"]
     build:
       context: .
       dockerfile: Dockerfile

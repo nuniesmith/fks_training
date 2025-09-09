@@ -11,10 +11,10 @@ import torch
 from framework.base import BaseService
 from framework.patterns.space_based import Space
 from models.registry import ModelRegistry
-from Zservices.training.dataset_manager import DatasetManager
-from Zservices.training.gpu_manager import GPUManager
-from Zservices.training.pipelines import PipelineFactory
-from Zservices.training.types import TrainingJobConfig, TrainingResult
+from services.training.dataset_manager import DatasetManager
+from services.training.gpu_manager import GPUManager
+from services.training.pipelines import PipelineFactory
+from services.training.types import TrainingJobConfig, TrainingResult
 
 
 @dataclass
