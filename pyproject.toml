@@ -1,20 +1,23 @@
 [project]
-name = "fks_training"
+name = "training-service"
 version = "0.1.0"
-description = "FKS Model Training Service"
+description = "FKS Model Training Service (flat src layout)"
 requires-python = ">=3.11"
 readme = "README.md"
 license = { text = "MIT" }
-authors = ["FKS <nunie.smith01@gmail.com>"]
+authors = ["nuniesmith"]
 
 dependencies = [
   "numpy",
   "pandas",
-  "shared_python @ file://../../../shared/python",
   "scikit-learn",
   "xgboost",
   "catboost",
+  "flask"
 ]
+
+[project.scripts]
+training = "main:main"
 
 [project.optional-dependencies]
 ml = ["scikit-learn", "torch"]
