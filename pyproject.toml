@@ -1,0 +1,28 @@
+[project]
+name = "training-service"
+version = "0.1.0"
+description = "FKS Model Training Service (flat src layout)"
+requires-python = ">=3.11"
+readme = "README.md"
+license = { text = "MIT" }
+authors = ["nuniesmith"]
+
+dependencies = [
+  "numpy",
+  "pandas",
+  "scikit-learn",
+  "xgboost",
+  "catboost",
+  "flask"
+]
+
+[project.scripts]
+training = "main:main"
+
+[project.optional-dependencies]
+ml = ["scikit-learn", "torch"]
+gpu = ["torch" ]
+explain = ["shap"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
