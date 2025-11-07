@@ -12,6 +12,6 @@ matplotlib==3.10.6
 seaborn==0.13.2
 tensorboard==2.20.0
 optuna==4.5.0
-mlflow==3.3.2
+mlflow==3.5.1
 pytz
 zoneinfo-backport; python_version < "3.9"
