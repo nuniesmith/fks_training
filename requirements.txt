@@ -1,5 +1,5 @@
 torch==2.8.0
-torchvision==0.23.0
+torchvision==0.24.0
 torchaudio==2.8.0
 transformers==4.56.0
 datasets==4.0.0
