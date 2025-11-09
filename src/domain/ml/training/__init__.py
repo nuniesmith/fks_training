@@ -1,4 +1,5 @@
-"""ML training subpackage: datasets, pipelines, and trainers."""
+"""
+Training module for ML models.
+"""
 
 __all__ = []
-

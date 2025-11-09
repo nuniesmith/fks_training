@@ -1,32 +1,30 @@
 services:
   fks_training:
-    profiles: ["gpu"]
     build:
       context: .
       dockerfile: Dockerfile
-    working_dir: /app/src
-    command: ["python", "-m", "main"]
-    environment:
-      TZ: America/Toronto
-      SERVICE_PORT: 8005
-      TRAINING_SERVICE_PORT: 8005
-      PYTHONPATH: /app/src
+    image: nuniesmith/fks_training:latest
+    container_name: fks_training
     ports:
-      - "8005:8005"
-    volumes:
-      - /etc/timezone:/etc/timezone:ro
-      - /etc/localtime:/etc/localtime:ro
-      - ./logs:/app/logs
-      - ./models:/app/models
-    networks: [fks_net]
+      - "8009:8009"
+    environment:
+      - SERVICE_NAME=fks_training
+      - SERVICE_PORT=8009
+      - PYTHONPATH=/app/src:/app
+      - TZ=America/Toronto
+    networks:
+      - fks-network
+    restart: unless-stopped
     healthcheck:
-      test: ["CMD-SHELL", "curl -f http://localhost:8005/health || exit 1"]
+      test: ["CMD", "curl", "-f", "http://localhost:8009/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 20s
+    volumes:
+      - ./logs:/app/logs
+      - ./models:/app/models
 
 networks:
-  fks_net:
-    name: fks_net
+  fks-network:
     external: true

@@ -1,0 +1,107 @@
+name: fks_training
+
+# Entry points for MLflow Projects
+entry_points:
+  train:
+    parameters:
+      model_name:
+        type: str
+        default: "lstm_price_forecast"
+      symbol:
+        type: str
+        default: "BTC/USDT"
+      sequence_length:
+        type: int
+        default: 60
+      batch_size:
+        type: int
+        default: 32
+      epochs:
+        type: int
+        default: 100
+      learning_rate:
+        type: float
+        default: 0.001
+      dropout:
+        type: float
+        default: 0.2
+      data_path:
+        type: str
+        default: ""
+      interval:
+        type: str
+        default: "1h"
+      days_back:
+        type: int
+        default: 30
+    command: >
+      python -m src.domain.ml.training.train
+        --model-name {model_name}
+        --symbol {symbol}
+        --sequence-length {sequence_length}
+        --batch-size {batch_size}
+        --epochs {epochs}
+        --learning-rate {learning_rate}
+        --dropout {dropout}
+        --data-path {data_path}
+        --interval {interval}
+        --days-back {days_back}
+
+  evaluate:
+    parameters:
+      model_path:
+        type: str
+      test_data_path:
+        type: str
+      sequence_length:
+        type: int
+        default: 60
+      batch_size:
+        type: int
+        default: 32
+      device:
+        type: str
+        default: "cpu"
+      tracking_uri:
+        type: str
+        default: ""
+      run_id:
+        type: str
+        default: ""
+    command: >
+      python -m src.domain.ml.training.evaluate
+        --model-path {model_path}
+        --test-data-path {test_data_path}
+        --sequence-length {sequence_length}
+        --batch-size {batch_size}
+        --device {device}
+        --tracking-uri {tracking_uri}
+        --run-id {run_id}
+
+  deploy:
+    parameters:
+      model_uri:
+        type: str
+      model_name:
+        type: str
+        default: "lstm_price_forecast"
+      stage:
+        type: str
+        default: "staging"
+      action:
+        type: str
+        default: "promote"
+      tracking_uri:
+        type: str
+        default: ""
+    command: >
+      python -m src.domain.ml.training.deploy
+        --model-uri {model_uri}
+        --model-name {model_name}
+        --stage {stage}
+        --action {action}
+        --tracking-uri {tracking_uri}
+
+# Environment specification
+conda_env: conda.yaml
+

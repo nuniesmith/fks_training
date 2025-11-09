@@ -180,13 +180,26 @@ class TrainingService(BaseService):
 
         with mlflow.start_run(run_name=run_name):
             # Log job parameters
-            mlflow.log_params(job_config.to_dict())
+            job_params = job_config.to_dict() if hasattr(job_config, "to_dict") else {}
+            mlflow.log_params(job_params)
             mlflow.log_param("job_id", job_id)
+            mlflow.log_param("model_name", job_config.model_name)
+            mlflow.log_param("pipeline_type", job_config.pipeline_type)
+
+            # Log system information
+            import platform
+            import torch
+            mlflow.log_param("python_version", platform.python_version())
+            mlflow.log_param("platform", platform.system())
+            if torch.cuda.is_available():
+                mlflow.log_param("gpu_count", torch.cuda.device_count())
+                mlflow.log_param("gpu_name", torch.cuda.get_device_name(0))
 
             try:
                 yield
             except Exception as e:
                 mlflow.log_param("error", str(e))
+                mlflow.log_metric("training_failed", 1)
                 raise
 
     async def _execute_training(
@@ -201,7 +214,48 @@ class TrainingService(BaseService):
 
         # Evaluate model
         metrics = await pipeline.evaluate(model)
+        
+        # Log metrics with enhanced tracking
         mlflow.log_metrics(metrics)
+        
+        # Log additional trading-specific metrics if available
+        if isinstance(metrics, dict):
+            # Log Sharpe ratio if available
+            if "sharpe_ratio" in metrics:
+                mlflow.log_metric("sharpe_ratio", metrics["sharpe_ratio"])
+            
+            # Log return metrics
+            if "total_return" in metrics:
+                mlflow.log_metric("total_return", metrics["total_return"])
+            if "annualized_return" in metrics:
+                mlflow.log_metric("annualized_return", metrics["annualized_return"])
+            
+            # Log risk metrics
+            if "max_drawdown" in metrics:
+                mlflow.log_metric("max_drawdown", metrics["max_drawdown"])
+            if "volatility" in metrics:
+                mlflow.log_metric("volatility", metrics["volatility"])
+            
+            # Log accuracy/precision metrics for classification
+            if "accuracy" in metrics:
+                mlflow.log_metric("accuracy", metrics["accuracy"])
+            if "precision" in metrics:
+                mlflow.log_metric("precision", metrics["precision"])
+            if "recall" in metrics:
+                mlflow.log_metric("recall", metrics["recall"])
+            if "f1_score" in metrics:
+                mlflow.log_metric("f1_score", metrics["f1_score"])
+            
+            # Log regression metrics
+            if "mse" in metrics:
+                mlflow.log_metric("mse", metrics["mse"])
+            if "rmse" in metrics:
+                mlflow.log_metric("rmse", metrics["rmse"])
+            if "mae" in metrics:
+                mlflow.log_metric("mae", metrics["mae"])
+            if "r2_score" in metrics:
+                mlflow.log_metric("r2_score", metrics["r2_score"])
+        
         self._job_statuses[job_id].progress = 0.9
 
         # Save model to registry
