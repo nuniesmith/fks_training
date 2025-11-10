@@ -4,6 +4,7 @@ FROM python:3.12-slim AS builder
 WORKDIR /app
 
 # Install build dependencies (scipy, numpy, etc. need fortran and lapack, TA-Lib needs autotools)
+# TA-Lib needs additional dependencies for compilation
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
@@ -19,6 +20,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     automake \
     libtool \
     libc-bin \
+    file \
+    binutils \
     && rm -rf /var/lib/apt/lists/*
 
 # Upgrade pip, setuptools, and wheel (better caching with BuildKit)
@@ -75,21 +78,29 @@ RUN set -e; \
         exit 1; \
     fi; \
     echo "=== Running configure ==="; \
-    if ! ./configure --prefix=/usr > /tmp/configure.log 2>&1; then \
+    # Show configure output in real-time and save to log
+    if ! ./configure --prefix=/usr 2>&1 | tee /tmp/configure.log; then \
         echo "=== Configure failed ==="; \
         echo "Configure output:"; \
         cat /tmp/configure.log; \
         if [ -f config.log ]; then \
-            echo "=== config.log ==="; \
+            echo "=== config.log (last 100 lines) ==="; \
             tail -100 config.log; \
         fi; \
         exit 1; \
     fi; \
+    echo "=== Configure successful ==="; \
     echo "=== Building TA-Lib ==="; \
-    if ! make -j$(nproc) > /tmp/make.log 2>&1; then \
+    # Build with fewer parallel jobs to avoid memory issues and show output
+    # Use -j2 instead of -j$(nproc) to be more conservative
+    if ! make -j2 2>&1 | tee /tmp/make.log; then \
         echo "=== Make failed ==="; \
-        echo "Last 100 lines of make.log:"; \
-        tail -100 /tmp/make.log; \
+        echo "Full make output:"; \
+        cat /tmp/make.log; \
+        if [ -f config.log ]; then \
+            echo "=== config.log (last 50 lines) ==="; \
+            tail -50 config.log; \
+        fi; \
         exit 1; \
     fi; \
     echo "=== Installing TA-Lib ==="; \
