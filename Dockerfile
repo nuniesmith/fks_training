@@ -79,8 +79,9 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 
 # Install Python dependencies with BuildKit cache mount
 # Only install requirements.txt, dev dependencies are optional
+# Use --no-cache-dir to reduce disk usage in CI
 RUN --mount=type=cache,target=/root/.cache/pip \
-    python -m pip install --user --no-warn-script-location -r requirements.txt
+    python -m pip install --user --no-warn-script-location --no-cache-dir -r requirements.txt
 
 # Runtime stage
 FROM python:3.12-slim
