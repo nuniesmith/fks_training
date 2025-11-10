@@ -97,5 +97,5 @@ except Exception: sys.exit(1)" || exit 1
 EXPOSE 8005
 
 # Use entrypoint script if available, otherwise run directly
-ENTRYPOINT ["/bin/bash", "-c"]
-CMD ["if [ -f entrypoint.sh ]; then ./entrypoint.sh; else python src/main.py; fi"]
+# Note: Using shell form to allow conditional execution
+CMD if [ -f entrypoint.sh ]; then ./entrypoint.sh; else python src/main.py; fi
