@@ -3,7 +3,7 @@ FROM python:3.12-slim AS builder
 
 WORKDIR /app
 
-# Install build dependencies (scipy, numpy, etc. need fortran and lapack, TA-Lib needs wget and make)
+# Install build dependencies (scipy, numpy, etc. need fortran and lapack, TA-Lib needs autotools)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
@@ -14,6 +14,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libopenblas-dev \
     liblapack-dev \
     pkg-config \
+    autoconf \
+    automake \
+    libtool \
     libc-bin \
     && rm -rf /var/lib/apt/lists/*
 
@@ -25,11 +28,22 @@ RUN --mount=type=cache,target=/root/.cache/pip \
 RUN wget -q http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
     tar -xzf ta-lib-0.4.0-src.tar.gz && \
     cd ta-lib/ && \
-    wget -q -O config.guess 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD' && \
-    wget -q -O config.sub 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD' && \
-    ./configure --prefix=/usr && \
-    make -j$(nproc) && \
-    make install && \
+    ls -la && \
+    if [ ! -f configure ]; then \
+        echo "Configure script not found, checking for autogen.sh..." && \
+        if [ -f autogen.sh ]; then \
+            chmod +x autogen.sh && ./autogen.sh; \
+        elif [ -f bootstrap ]; then \
+            chmod +x bootstrap && ./bootstrap; \
+        else \
+            echo "No configure, autogen.sh, or bootstrap found. Running autoreconf..." && \
+            autoreconf -fvi; \
+        fi; \
+    fi && \
+    chmod +x configure && \
+    ./configure --prefix=/usr || (echo "=== Configure failed ===" && ls -la && cat config.log 2>/dev/null || echo "No config.log" && exit 1) && \
+    make -j$(nproc) || (echo "=== Make failed ===" && exit 1) && \
+    make install || (echo "=== Make install failed ===" && exit 1) && \
     cd .. && \
     rm -rf ta-lib ta-lib-0.4.0-src.tar.gz && \
     ldconfig
