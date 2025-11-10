@@ -105,15 +105,13 @@ RUN set -e; \
 # Copy dependency files (for better layer caching)
 COPY requirements.txt requirements.dev.txt* ./
 
-# Install numpy first as a build dependency for scipy and other packages
-RUN --mount=type=cache,target=/root/.cache/pip \
-    python -m pip install --user --no-warn-script-location numpy
-
 # Install Python dependencies with BuildKit cache mount
-# Only install requirements.txt, dev dependencies are optional
 # Use --no-cache-dir to reduce disk usage in CI
+# Clean up pip cache after installation to free disk space
 RUN --mount=type=cache,target=/root/.cache/pip \
-    python -m pip install --user --no-warn-script-location --no-cache-dir -r requirements.txt
+    python -m pip install --user --no-warn-script-location --no-cache-dir -r requirements.txt \
+    && python -m pip cache purge || true \
+    && rm -rf /root/.cache/pip/* /tmp/pip-* 2>/dev/null || true
 
 # Runtime stage
 FROM python:3.12-slim
