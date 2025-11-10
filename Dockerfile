@@ -3,20 +3,36 @@ FROM python:3.12-slim AS builder
 
 WORKDIR /app
 
-# Install build dependencies (scipy, numpy, etc. need fortran and lapack)
+# Install build dependencies (scipy, numpy, etc. need fortran and lapack, TA-Lib needs wget and make)
 RUN apt-get update && apt-get install -y --no-install-recommends \
     gcc \
     g++ \
     gfortran \
+    make \
+    wget \
     build-essential \
     libopenblas-dev \
     liblapack-dev \
     pkg-config \
+    libc-bin \
     && rm -rf /var/lib/apt/lists/*
 
 # Upgrade pip, setuptools, and wheel (better caching with BuildKit)
 RUN --mount=type=cache,target=/root/.cache/pip \
     python -m pip install --upgrade pip setuptools wheel
+
+# Install TA-Lib C library (required before installing Python TA-Lib package)
+RUN wget -q http://prdownloads.sourceforge.net/ta-lib/ta-lib-0.4.0-src.tar.gz && \
+    tar -xzf ta-lib-0.4.0-src.tar.gz && \
+    cd ta-lib/ && \
+    wget -q -O config.guess 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.guess;hb=HEAD' && \
+    wget -q -O config.sub 'http://git.savannah.gnu.org/gitweb/?p=config.git;a=blob_plain;f=config.sub;hb=HEAD' && \
+    ./configure --prefix=/usr && \
+    make -j$(nproc) && \
+    make install && \
+    cd .. && \
+    rm -rf ta-lib ta-lib-0.4.0-src.tar.gz && \
+    ldconfig
 
 # Copy dependency files (for better layer caching)
 COPY requirements.txt requirements.dev.txt* ./
@@ -54,6 +70,9 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Create non-root user first (before copying files)
 RUN useradd -u 1000 -m -s /bin/bash appuser
 
+# Copy TA-Lib libraries from builder (needed at runtime)
+COPY --from=builder /usr/lib/libta_lib.so* /usr/lib/
+
 # Copy Python packages from builder with correct ownership
 COPY --from=builder --chown=appuser:appuser /root/.local /home/appuser/.local
 
@@ -78,4 +97,5 @@ except Exception: sys.exit(1)" || exit 1
 EXPOSE 8005
 
 # Use entrypoint script if available, otherwise run directly
-CMD if [ -f entrypoint.sh ]; then ./entrypoint.sh; else python src/main.py; fi
+ENTRYPOINT ["/bin/bash", "-c"]
+CMD ["if [ -f entrypoint.sh ]; then ./entrypoint.sh; else python src/main.py; fi"]
