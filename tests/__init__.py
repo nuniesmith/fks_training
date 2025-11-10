@@ -1,4 +1,1 @@
-"""
-Tests for fks_training service
-"""
-
+"""Tests for training service"""

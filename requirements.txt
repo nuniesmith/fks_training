@@ -23,3 +23,13 @@ alibi-detect>=0.11.0  # Drift detection
 scipy>=1.11.0  # Statistical tests
 # Data Client
 httpx>=0.25.0  # HTTP client for API calls
+yfinance>=0.2.0  # Yahoo Finance data for trading environments
+ta>=0.11.0  # Technical analysis indicators
+TA-Lib>=0.4.0  # Technical Analysis Library (requires C library installation)
+# Logging
+loguru>=0.7.0  # Structured logging
+# Testing
+pytest>=7.4.0  # Testing framework
+pytest-asyncio>=0.21.0  # Async test support
+pytest-cov>=4.1.0  # Coverage reporting
+pytest-mock>=3.11.0  # Mocking utilities
