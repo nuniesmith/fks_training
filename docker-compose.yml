@@ -6,23 +6,24 @@ services:
     image: nuniesmith/fks_training:latest
     container_name: fks_training
     ports:
-      - "8009:8009"
+      - "8011:8011"
     environment:
       - SERVICE_NAME=fks_training
-      - SERVICE_PORT=8009
+      - SERVICE_PORT=8011
       - PYTHONPATH=/app/src:/app
       - TZ=America/Toronto
     networks:
       - fks-network
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8009/health"]
+      test: ["CMD", "curl", "-f", "http://localhost:8011/health"]
       interval: 30s
       timeout: 10s
       retries: 3
       start_period: 20s
     volumes:
-      - ./logs:/app/logs
+      # Logs stored inside container at /app/logs (not mounted externally)
+      # Access via: docker logs fks_training
       - ./models:/app/models
 
 networks:
