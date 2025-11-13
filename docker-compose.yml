@@ -3,7 +3,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    image: nuniesmith/fks_training:latest
+    image: nuniesmith/fks:training-latest
     container_name: fks_training
     ports:
       - "8011:8011"
