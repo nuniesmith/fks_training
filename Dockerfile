@@ -24,12 +24,18 @@ RUN --mount=type=cache,target=/root/.cache/pip \
     && python -m pip cache purge || true \
     && rm -rf /root/.cache/pip/* /tmp/pip-* 2>/dev/null || true
 
+# Create non-root user if it doesn't exist
+RUN id -u appuser 2>/dev/null || useradd -u 1000 -m -s /bin/bash appuser
+
 # Copy application source
 COPY --chown=appuser:appuser src/ ./src/
 COPY --chown=appuser:appuser entrypoint.sh* ./
 
 # Make entrypoint executable if it exists
 RUN if [ -f entrypoint.sh ]; then chmod +x entrypoint.sh; fi
+
+# Switch to non-root user
+USER appuser
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
