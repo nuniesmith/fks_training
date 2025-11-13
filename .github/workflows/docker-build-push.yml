@@ -55,6 +55,9 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v'))
+    
+    # Note: This service requires base image nuniesmith/fks:docker-gpu to exist on Docker Hub
+    # Build and push base images first using: repo/docker/build-all-bases.sh
 
     steps:
       - name: Checkout code
@@ -71,7 +74,8 @@ jobs:
 
       - name: Pull base image
         run: |
-          docker pull ${{ env.DOCKER_REPO }}:docker-gpu || echo "Base image not found, will build from scratch"
+          docker pull ${{ env.DOCKER_REPO }}:docker-gpu || echo "⚠️ Base image docker-gpu not found on Docker Hub"
+          echo "If base image doesn't exist, build may fail. Build and push base images first."
 
       - name: Extract metadata
         id: meta
