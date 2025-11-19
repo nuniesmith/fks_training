@@ -1,6 +1,6 @@
 # Optimized Dockerfile for fks_training - Uses base image directly to reduce size
-# Uses GPU base image with all dependencies pre-installed
-FROM nuniesmith/fks:docker-gpu
+# Temporarily uses ML base until GPU base is built; change to docker-gpu after GPU image exists
+FROM nuniesmith/fks:docker-ml-latest
 
 WORKDIR /app
 
