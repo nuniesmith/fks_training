@@ -11,8 +11,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONPATH=/app/src:/app \
     SERVICE_NAME=training \
     SERVICE_TYPE=training \
-    SERVICE_PORT=8011 \
-    TRAINING_SERVICE_PORT=8011 \
+    SERVICE_PORT=8008 \
+    TRAINING_SERVICE_PORT=8008 \
     PATH=/usr/local/bin:$PATH
 
 # Install only service-specific packages
@@ -39,13 +39,13 @@ USER appuser
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
-    CMD python -c "import os,urllib.request,sys;port=os.getenv('SERVICE_PORT','8011');u=f'http://localhost:{port}/health';\
-import urllib.error;\
-try: urllib.request.urlopen(u,timeout=3);\
-except Exception: sys.exit(1)" || exit 1
+    CMD python -c "import os,urllib.request,sys;port=os.getenv('SERVICE_PORT','8008');u=f'http://localhost:{port}/health';\
+    import urllib.error;\
+    try: urllib.request.urlopen(u,timeout=3);\
+    except Exception: sys.exit(1)" || exit 1
 
 # Expose the service port
-EXPOSE 8011
+EXPOSE 8008
 
 # Use entrypoint script if available, otherwise run directly
 CMD if [ -f entrypoint.sh ]; then ./entrypoint.sh; else python src/main.py; fi
