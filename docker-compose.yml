@@ -2,9 +2,9 @@ services:
   fks_training:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: docker/Dockerfile
     image: nuniesmith/fks:training-latest
-    container_name: fks_training
+    container_name: fks-training
     ports:
       - "8011:8011"
     environment:

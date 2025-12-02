@@ -190,13 +190,45 @@ class HealthEndpoint:
                     }
                 )
 
-            # Metrics endpoint (if enabled)
+            # Prometheus metrics endpoint (if enabled)
             if self.config.enable_metrics:
-
-                @self.app.route("/metrics")
-                def metrics():
-                    self.metrics["requests_total"] += 1
-                    return jsonify(self.metrics)
+                try:
+                    # Try to use standardized Prometheus metrics
+                    import sys
+                    import os
+                    # Try to import from fks_api framework (if available)
+                    api_framework_path = os.path.join(
+                        os.path.dirname(__file__), '..', '..', '..', '..', 'api', 'src'
+                    )
+                    if os.path.exists(api_framework_path) and api_framework_path not in sys.path:
+                        sys.path.insert(0, api_framework_path)
+                    
+                    try:
+                        from framework.middleware.flask_prometheus_metrics import setup_flask_prometheus_metrics
+                        setup_flask_prometheus_metrics(
+                            self.app,
+                            service_name=self.config.name,
+                            version=self.config.version,
+                            commit=os.getenv("GIT_COMMIT", os.getenv("COMMIT_SHA")),
+                            build_date=os.getenv("BUILD_DATE", os.getenv("BUILD_TIMESTAMP")),
+                            enable_http_metrics=True,
+                            enable_process_metrics=True,
+                        )
+                        self.logger.info(f"Prometheus metrics configured for {self.config.name}")
+                    except ImportError:
+                        # Fallback: use prometheus_client directly
+                        from prometheus_client import make_wsgi_app
+                        metrics_app = make_wsgi_app()
+                        self.app.wsgi_app = metrics_app
+                        self.logger.info(f"Basic Prometheus metrics enabled for {self.config.name}")
+                except Exception as e:
+                    # Fallback to JSON metrics if Prometheus setup fails
+                    self.logger.warning(f"Could not set up Prometheus metrics: {e}. Using JSON metrics.")
+                    
+                    @self.app.route("/metrics")
+                    def metrics():
+                        self.metrics["requests_total"] += 1
+                        return jsonify(self.metrics)
 
             # Add custom endpoints (supports multiple formats):
             # - path: callable

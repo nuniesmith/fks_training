@@ -26,3 +26,4 @@ jobs:
       cleanup_disk: true
     secrets:
       docker_token: ${{ secrets.DOCKER_TOKEN }}
+      codecov_token: ${{ secrets.CODECOV_TOKEN }}
